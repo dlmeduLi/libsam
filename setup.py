@@ -20,13 +20,13 @@ def read(fname):
 
 setup(
     name = "libsam",
-    version = "0.1.0",
+    version = "0.1.1",
     author = "dlmeduLi",
     author_email = "dlmeduLi@163.com",
     description = ("Bio-Informatics sam file libraries."),
     license = "BSD",
     keywords = "bioinformatic samfile parser",
-    url = "https://github.com/dlmeduLi/sam-parser",
+    url = "https://github.com/dlmeduLi/libsam",
     packages=['libsam'],
     long_description=read('README.rst'),
     classifiers=[
