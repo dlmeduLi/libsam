@@ -144,7 +144,7 @@ class SamAlignment(object):
 
 		# validate qname field
 
-		if(not qname.match(fields[0])):
+		if(not qnameRe.match(fields[0])):
 			self.qname = ''
 			return False
 		self.qname = fields[0].strip()
