@@ -20,7 +20,7 @@ def read(fname):
 
 setup(
     name = "libsam",
-    version = "0.1.2",
+    version = "0.1.3",
     author = "dlmeduLi",
     author_email = "dlmeduLi@163.com",
     description = ("Bio-Informatics sam file libraries."),
