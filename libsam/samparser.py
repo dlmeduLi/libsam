@@ -8,45 +8,31 @@ import re
 #			files
 ############################################################
 
-REGEXP_BLANK_LINE = '^\s*$'
-REGEXP_NUM 		= 	'[-+]?[0-9]+'
-REGEXP_FLOAT	=	'[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?'
-REGEXP_PRINT	=	'[ !-~]+'
-REGEXP_HEX		=	'[0-9A-F]+'
-REGEXP_ARRAY	=	'[cCsSiIf](,[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+'
-
-REGEXP_SAM_HEADER		=	'(^@[A-Za-z][A-Za-z](\t[A-Za-z][A-Za-z0-9]:[ -~]+)+$)|(^@CO\t.*)'
-
-REGEXP_QNAME = '[!-?A-~]{1,255}'
-REGEXP_INT = '^[0-9]+$'
-REGEXP_RNAME = '\*|[!-()+-<>-~][!-~]*'
-REGEXP_CIGAR = '\*|([0-9]+[MIDNSHPX=])+'
-REGEXP_RNEXT = '\*|=|[!-()+-<>-~][!-~]'
-REGEXP_TLEN = '^-?[0-9]+$'
-REGEXP_SEQ = '\*|[A-Za-z=.]+'
-REGEXP_QUAL = '[!-~]+'
-REGEXP_OPTION = '[A-Za-z][A-Za-z0-9]:[AifZHB]:[!-~]+'
-
 # precompiled regular expression
 
-blankLineRe = re.compile(REGEXP_BLANK_LINE)
-numRe = re.compile(REGEXP_NUM)
-floatRe = re.compile(REGEXP_FLOAT)
-printRe = re.compile(REGEXP_PRINT)
-hexRe = re.compile(REGEXP_HEX)
-arrayRe = re.compile(REGEXP_ARRAY)
+blankLineRe = re.compile('^\s*$')
+numRe = re.compile('[-+]?[0-9]+')
+floatRe = re.compile('[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?')
+printRe = re.compile('[ !-~]+')
+hexRe = re.compile('[0-9A-F]+')
+arrayRe = re.compile('[cCsSiIf](,[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+')
 
-samHeaderRe = re.compile(REGEXP_SAM_HEADER)
+samHeaderRe = re.compile('(^@[A-Za-z][A-Za-z](\t[A-Za-z][A-Za-z0-9]:[ -~]+)+$)|(^@CO\t.*)')
 
-qnameRe = re.compile(REGEXP_QNAME)
-intRe = re.compile(REGEXP_INT)
-rnameRe = re.compile(REGEXP_RNAME)
-cigarRe = re.compile(REGEXP_CIGAR)
-rnextRe = re.compile(REGEXP_RNEXT)
-tlenRe = re.compile(REGEXP_TLEN)
-seqRe = re.compile(REGEXP_SEQ)
-qualRe = re.compile(REGEXP_QUAL)
-optionRe = re.compile(REGEXP_OPTION)
+qnameRe = re.compile('[!-?A-~]{1,255}')
+intRe = re.compile('^[0-9]+$')
+rnameRe = re.compile('\*|[!-()+-<>-~][!-~]*')
+cigarRe = re.compile('\*|([0-9]+[MIDNSHPX=])+')
+rnextRe = re.compile('\*|=|[!-()+-<>-~][!-~]')
+tlenRe = re.compile('^-?[0-9]+$')
+seqRe = re.compile('\*|[A-Za-z=.]+')
+qualRe = re.compile('[!-~]+')
+optionRe = re.compile('[A-Za-z][A-Za-z0-9]:[AifZHB]:[!-~]+')
+
+mdRe = re.compile('[0-9]+(([A-Z]|\^[A-Z]+)[0-9]+)*')
+tagNumRe = re.compile('[0-9]+')
+mdTagRe = re.compile('[0-9]+|\^[A-Z]+|[A-Z]+')
+cigarTagRe = re.compile('[MIDNSHPX=]')
 
 ############################################################
 # Class： 	AlignmentOptional
@@ -248,6 +234,78 @@ class SamAlignment(object):
 			i = i + 1
 
 		return True
+
+	# Adjusted sequence by CIGAR value
+
+	def seqByCigar(self):
+		if(self.cigar == ''):
+			return self.seq
+		
+		nums = tagNumRe.findall(self.cigar)
+		tags = cigarTagRe.findall(self.cigar)
+		numLen = len(nums)
+		tagLen = len(tags)
+		if(numLen != tagLen):
+			return ''
+
+		orgSeq = list(self.seq)
+		orgSeq.reverse()
+		adjSeq = ''
+		try:
+			for i in range(tagLen):
+				if(tags[i] == 'M'):
+					for j in range(int(nums[i])):
+						adjSeq += orgSeq.pop()
+				elif(tags[i] == 'I'):
+					for j in range(int(nums[i])):
+						orgSeq.pop()
+				elif(tags[i] == 'D'):
+					for j in range(int(nums[i])):
+						adjSeq += 'N'
+				elif(tags[i] == 'N'):
+					for j in range(int(nums[i])):
+						adjSeq += 'N'
+				elif(tags[i] == 'S'):
+					for j in range(int(nums[i])):
+						orgSeq.pop()
+				elif(tags[i] == '='):
+					for j in range(int(nums[i])):
+						adjSeq += orgSeq.pop()
+				elif(tags[i] == 'X'):
+					for j in range(int(nums[i])):
+						adjSeq += orgSeq.pop()
+		except IndexError:
+			return ''
+
+		return adjSeq
+
+	# Adjusted sequence by MD value
+
+	def seqByMD(self):
+		if(not ('MD' in self.tags)):
+			return self.seq
+
+		mdstr = self.tags['MD'].value
+		tags = mdTagRe.findall(mdstr)
+
+		orgSeq = list(self.seq)
+		orgSeq.reverse()
+		adjSeq = ''
+		try:
+			for tag in tags:
+				if(tag.isdigit()):
+					for j in range(int(tag)):
+						adjSeq += orgSeq.pop()
+				elif(tag.isalpha()):
+					for j in range(len(tag)):
+						adjSeq += orgSeq.pop()
+				elif(tag[0] == '^'):
+					for j in range(len(tag) - 1):
+						adjSeq += 'N'
+		except IndexError:
+			return ''
+
+		return adjSeq
 
 	# return alignment
 
