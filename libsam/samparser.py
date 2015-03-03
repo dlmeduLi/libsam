@@ -3,6 +3,28 @@
 import re
 
 ############################################################
+# Utils functions:
+#			Useful common bioinformatic functions
+############################################################
+
+def ReverseComplete(seq):
+	rSeq = seq[::-1]
+	rcSeq = ''
+	for p in rSeq :
+		if(p == 'A'):
+			rcSeq += 'T'
+		elif(p == 'C'):
+			rcSeq += 'G'
+		elif(p == 'G'):
+			rcSeq += 'C'
+		elif(p == 'T'):
+			rcSeq += 'A'
+		else:
+			rcSeq += p
+
+	return rcSeq
+
+############################################################
 # Constants:
 #			Constants about regular expressions for sam 
 #			files
