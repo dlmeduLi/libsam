@@ -143,7 +143,7 @@ class SamAlignment(object):
 		self.tags = {}
 
 	def parse(self, astr):
-		fields = astr.split()
+		fields = astr.split('\t')
 
 		# there are 11 mandatory fields in a valid aligment record 
 
