@@ -33,28 +33,28 @@ def ReverseComplete(seq):
 # precompiled regular expression
 
 blankLineRe = re.compile('^\s*$')
-numRe = re.compile('[-+]?[0-9]+')
-floatRe = re.compile('[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?')
-printRe = re.compile('[ !-~]+')
-hexRe = re.compile('[0-9A-F]+')
-arrayRe = re.compile('[cCsSiIf](,[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+')
+numRe = re.compile('^[-+]?[0-9]+$')
+floatRe = re.compile('^[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?$')
+printRe = re.compile('^[ !-~]+$')
+hexRe = re.compile('^[0-9A-F]+$')
+arrayRe = re.compile('^[cCsSiIf](,[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?)+$')
 
-samHeaderRe = re.compile('(^@[A-Za-z][A-Za-z](\t[A-Za-z][A-Za-z0-9]:[ -~]+)+$)|(^@CO\t.*)')
+samHeaderRe = re.compile('(^@[A-Za-z][A-Za-z](\t[A-Za-z][A-Za-z0-9]:[ -~]+)+$)|(^@CO\t.*)$')
 
-qnameRe = re.compile('[!-?A-~]{1,255}')
+qnameRe = re.compile('^[ -?A-~]{1,255}$')
 intRe = re.compile('^[0-9]+$')
-rnameRe = re.compile('\*|[!-()+-<>-~][!-~]*')
-cigarRe = re.compile('\*|([0-9]+[MIDNSHPX=])+')
-rnextRe = re.compile('\*|=|[!-()+-<>-~][!-~]')
+rnameRe = re.compile('^\*|[!-()+-<>-~][!-~]*$')
+cigarRe = re.compile('^\*|([0-9]+[MIDNSHPX=])+$')
+rnextRe = re.compile('^\*|=|[!-()+-<>-~][!-~]$')
 tlenRe = re.compile('^-?[0-9]+$')
-seqRe = re.compile('\*|[A-Za-z=.]+')
-qualRe = re.compile('[!-~]+')
-optionRe = re.compile('[A-Za-z][A-Za-z0-9]:[AifZHB]:[!-~]+')
+seqRe = re.compile('^\*|[A-Za-z=.]+$')
+qualRe = re.compile('^[!-~]+$')
+optionRe = re.compile('^[A-Za-z][A-Za-z0-9]:[AifZHB]:[!-~]+$')
 
-mdRe = re.compile('[0-9]+(([A-Z]|\^[A-Z]+)[0-9]+)*')
-tagNumRe = re.compile('[0-9]+')
-mdTagRe = re.compile('[0-9]+|\^[A-Z]+|[A-Z]+')
-cigarTagRe = re.compile('[MIDNSHPX=]')
+mdRe = re.compile('^[0-9]+(([A-Z]|\^[A-Z]+)[0-9]+)*$')
+tagNumRe = re.compile('^[0-9]+$')
+mdTagRe = re.compile('^[0-9]+|\^[A-Z]+|[A-Z]+$')
+cigarTagRe = re.compile('^[MIDNSHPX=]$')
 
 ############################################################
 # Class： 	AlignmentOptional
