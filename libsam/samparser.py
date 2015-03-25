@@ -45,7 +45,7 @@ qnameRe = re.compile('^[ -?A-~]{1,255}$')
 intRe = re.compile('^[0-9]+$')
 rnameRe = re.compile('^\*|[!-()+-<>-~][!-~]*$')
 cigarRe = re.compile('^\*|([0-9]+[MIDNSHPX=])+$')
-rnextRe = re.compile('^\*|=|[!-()+-<>-~][!-~]$')
+rnextRe = re.compile('^\*|=|[!-()+-<>-~][!-~]*$')
 tlenRe = re.compile('^-?[0-9]+$')
 seqRe = re.compile('^\*|[A-Za-z=.]+$')
 qualRe = re.compile('^[!-~]+$')
@@ -166,7 +166,7 @@ class SamAlignment(object):
 		if(self.flag >= 0xFFFFFF):
 			self.flag = -1
 			return False
-
+		
 		# validate rname field
 
 		if(not rnameRe.match(fields[2])):
